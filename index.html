@@ -1,0 +1,32 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TimeLog Launcher</title>
+<style>
+  body {font:16px/1.5 system-ui, sans-serif; padding:20px;}
+  a.btn {display:inline-block; padding:10px 14px; border:1px solid #999; border-radius:8px; text-decoration:none}
+  .hint{color:#666; font-size:13px; margin-top:8px}
+</style>
+
+<h2>TimeLog を開く</h2>
+<p>開かない場合は「Chromeで開く」をタップしてください。</p>
+<p><a id="openChrome" class="btn">Chromeで開く</a></p>
+<p class="hint">※iPhoneは数秒後に自動で開きます。</p>
+<p class="hint"><a id="openNormal">通常の方法で開く（うまくいかない時）</a></p>
+
+<script>
+  // === 設定（ここだけ書き換える） ===
+  // /u/N/ の N は端末で使う Googleアカウントの“並び順”（0=1個目, 1=2個目, 2=3個目, …）
+  // 例: あなたは /u/3/ を貼っていたので、そのまま利用してOK。合わない場合は /u/0/ ~ /u/4/ を試してください。
+  const EXEC = 'https://script.google.com/u/3/macros/s/AKfycbxD2EgTb7SeKVQwopr2jaJ_5ZEYwmN11fXPKZoVsNV9r3cZUHikEp_0Rdt3zEdgyym-/exec';
+
+  // Android用：Chrome強制ディープリンク（ディープリンク：特定アプリを直接起動する仕組み）
+  const chromeUrl = 'googlechrome://navigate?url=' + encodeURIComponent(EXEC);
+  document.getElementById('openChrome').href = chromeUrl;
+
+  // フォールバック（代替処理）：iPhoneや非対応端末は通常URLへ遷移
+  setTimeout(() => { location.href = EXEC; }, 800);
+
+  // 明示リンク（手動で開く用）
+  document.getElementById('openNormal').href = EXEC;
+</script>
