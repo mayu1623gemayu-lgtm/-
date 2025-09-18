@@ -4,51 +4,23 @@
 <title>TimeLog Launcher</title>
 <style>
   body {font:16px/1.6 system-ui, sans-serif; padding:20px;}
-  a.btn {display:inline-block; padding:10px 14px; border:1px solid #888; border-radius:10px; text-decoration:none; margin-right:10px}
+  a.btn {display:inline-block; padding:10px 14px; border:1px solid #888; border-radius:10px; text-decoration:none}
   .hint{color:#666; font-size:13px; margin-top:10px}
-  .row{margin:14px 0}
 </style>
 
 <h2>TimeLog を開く</h2>
-
-<div class="row">
-  <!-- Android向け：Chromeを強制起動（intentスキーム） -->
-  <a id="openChrome" class="btn">Chromeで開く（強制）</a>
-  <!-- うまくいかない時のテスト用（plain=1） -->
-  <a id="openPlain" class="btn">テスト表示（Plain）</a>
-</div>
-
-<p class="hint">
-  ※Androidは上の<strong>「Chromeで開く（強制）」</strong>を使ってください。<br>
-  ※iPhoneは下の「通常で開く」でOKです（Safariで開きます）。
-</p>
-
-<div class="row">
-  <!-- iPhone/PC向け：通常URL -->
-  <a id="openNormal">通常で開く</a>
-</div>
+<p><a id="go" class="btn">このアカウントで開く</a></p>
+<p class="hint">※Android でも iPhone でもこのリンクをタップしてください。</p>
 
 <script>
-  // ===== ここだけ調整 =====
-  // /u/N/ の N は端末の Googleアカウントの順番（0=1個目, 1=2個目, …）
-  const EXEC = 'https://script.google.com/u/3/macros/s/AKfycbxD2EgTb7SeKVQwopr2jaJ_5ZEYwmN11fXPKZoVsNV9r3cZUHikEp_0Rdt3zEdgyym-/exec';
-  // =======================
+  // 素の exec URL（/u/N/ は付けない）
+  const EXEC = 'https://script.google.com/macros/s/AKfycbxD2EgTb7SeKVQwopr2jaJ_5ZEYwmN11fXPKZoVsNV9r3cZUHikEp_0Rdt3zEdgyym-/exec';
+  // あなたが使っている Gmail アドレスを入力
+  const EMAIL = 'mayu1623gemayu@gmail.com';  
 
-  const ua = navigator.userAgent.toLowerCase();
-  const isAndroid = ua.includes('android');
+  const url = 'https://accounts.google.com/AccountChooser?Email='
+              + encodeURIComponent(EMAIL)
+              + '&continue=' + encodeURIComponent(EXEC);
 
-  // Android用 Intent リンク（Chromeをピンポイントで指定）
-  // 形式: intent://navigate?url=ENC(URL)#Intent;scheme=googlechrome;package=com.android.chrome;end;
-  const intentUrl = 'intent://navigate?url=' + encodeURIComponent(EXEC)
-    + '#Intent;scheme=googlechrome;package=com.android.chrome;end;';
-
-  // テスト用（プレーン表示）
-  const plainUrl = EXEC + (EXEC.includes('?') ? '&' : '?') + 'plain=1';
-
-  // ボタンにリンクを設定
-  document.getElementById('openChrome').href = intentUrl;
-  document.getElementById('openPlain').href  = isAndroid ? intentUrl : plainUrl; // Androidは強制Chrome、iPhoneはplainへ
-  document.getElementById('openNormal').href = EXEC;
-
-  // ★自動遷移は行わない（Drive横取りを防ぐ）
+  document.getElementById('go').href = url;
 </script>
