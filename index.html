@@ -1,55 +1,42 @@
 <!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TimeLog Launcher (Diagnostics)</title>
+<title>TimeLog Launcher (ServiceLogin)</title>
 <style>
-  body{font:16px/1.6 system-ui,sans-serif;padding:20px}
-  .btn{display:block;margin:10px 0;padding:10px 14px;border:1px solid #888;border-radius:10px;text-decoration:none}
-  .small{color:#666;font-size:13px}
-  code{background:#f5f5f5;padding:2px 6px;border-radius:6px}
+  body{font:16px/1.6 system-ui,sans-serif;padding:22px}
+  .card{border:1px solid #ddd;border-radius:12px;padding:16px;max-width:560px}
+  button{padding:10px 14px;border:1px solid #888;border-radius:10px;background:#fff;cursor:pointer}
+  .small{color:#666;font-size:13px;margin-top:10px}
+  input[type=text]{width:100%;padding:8px;border:1px solid #ccc;border-radius:8px}
 </style>
 
-<h2>TimeLog を開く（診断）</h2>
-<p class="small">どれか一つでも開けばOKです。開けた経路を今後の固定リンクにします。</p>
+<div class="card">
+  <h2>TimeLog を開く（パスワードでサインイン）</h2>
+  <form id="f" action="https://accounts.google.com/ServiceLogin" method="GET" target="_self">
+    <!-- ★ここを書き換える：あなたの本番 /exec URL と Gmail -->
+    <input type="hidden" name="continue" id="cont" value="https://script.google.com/macros/s/AKfycbxD2EgTb7SeKVQwopr2jaJ_5ZEYwmN11fXPKZoVsNV9r3cZUHikEp_0Rdt3zEdgyym-/exec">
+    <input type="hidden" name="Email"    value="mayu1623gemayu@gmail.com">
+
+    <!-- これらは “パスワード入力画面” を強制するおまじない -->
+    <input type="hidden" name="hl"        value="ja">
+    <input type="hidden" name="flowName"  value="GlifWebSignIn">
+    <input type="hidden" name="flowEntry" value="ServiceLogin">
+    <input type="hidden" name="skipvpage" value="true">
+
+    <p class="small">※ボタンを押すと Google の<strong>パスワード入力画面</strong>に進みます。サインイン後に TimeLog が開きます。</p>
+    <button type="submit">パスワードで開く</button>
+  </form>
+
+  <p class="small" style="margin-top:18px">
+    開かない場合：<br>
+    1) <code>EXEC_URL</code> が <strong>/exec</strong>（本番デプロイ）であることを確認<br>
+    2) Apps Script の「ウェブアプリ」公開設定が正しいことを確認（少なくとも自分は開ける）<br>
+    3) もう一度このページを再読み込み → ボタン押下
+  </p>
+</div>
 
 <script>
-  // ======= ここだけ設定 =======
-  // 1) 素の exec（/u/N は付けない）
-  const EXEC = 'https://script.google.com/macros/s/AKfycbxD2EgTb7SeKVQwopr2jaJ_5ZEYwmN11fXPKZoVsNV9r3cZUHikEp_0Rdt3zEdgyym-/exec';
-  // 2) あなたの Gmail（複数ログイン対策）
-  const EMAIL = 'mayu1623gemayu@gmail.com';
-  // ===========================
-
-  const enc = encodeURIComponent;
-  const plain = EXEC + (EXEC.includes('?') ? '&' : '?') + 'plain=1';
-
-  // ★3経路（どれかが刺さる）
-  // A) AddSession（そのアカウントのセッションを追加してから続行）
-  const ADDSESSION = 'https://accounts.google.com/AddSession?Email=' + enc(EMAIL) + '&continue=' + enc(EXEC);
-  // B) AccountChooser（サインイン選択UI経由 / こちらの派生パス）
-  const SIGNINCH = 'https://accounts.google.com/AccountChooser/signinchooser?Email=' + enc(EMAIL) + '&continue=' + enc(EXEC);
-  // C) ServiceLogin（レガシー入口だが通る端末がある）
-  const SERVICELOGIN = 'https://accounts.google.com/ServiceLogin?Email=' + enc(EMAIL) + '&continue=' + enc(EXEC);
-
-  const links = [
-    ['① AddSession で開く（推奨）', ADDSESSION],
-    ['② AccountChooser で開く',      SIGNINCH],
-    ['③ ServiceLogin で開く',        SERVICELOGIN],
-    ['④ 直接 /exec を開く',          EXEC],
-    ['⑤ テスト表示（plain=1）',      plain]
-  ];
-
-  for (const [label, url] of links) {
-    const a = document.createElement('a');
-    a.className = 'btn';
-    a.textContent = label;
-    a.href = url;
-    a.target = '_blank'; // 新しいタブで開く（戻れない問題を避ける）
-    a.rel = 'noopener';
-    document.body.appendChild(a);
-    const p = document.createElement('p');
-    p.className = 'small';
-    p.innerHTML = `<code>${url}</code>`;
-    document.body.appendChild(p);
-  }
+  // 念のため：意図せぬ二重エンコードを防ぐ（/exec の末尾に空白等が混ざる事故対策）
+  const cont = document.getElementById('cont');
+  cont.value = (cont.value || '').trim();
 </script>
