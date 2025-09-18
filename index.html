@@ -1,25 +1,53 @@
 <!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TimeLog Launcher</title>
+<title>TimeLog Launcher for Android</title>
 <style>
   body{font:16px/1.6 system-ui,sans-serif;padding:22px}
   a.btn{display:block;margin:10px 0;padding:10px 14px;border:1px solid #888;border-radius:10px;text-decoration:none}
   .small{color:#666;font-size:13px}
+  input[type=text]{width:100%;padding:8px;border:1px solid #ccc;border-radius:8px}
 </style>
 
-<h2>TimeLog を開く</h2>
-<a id="btn1" class="btn">① Chromeで開く（強制）</a>
-<a id="btn2" class="btn">② 通常リンクで開く</a>
-<p class="small">※①でダメなら②を試し、Aの端末設定も実施してください。</p>
+<h2>TimeLog を開く（Android）</h2>
+<a id="b1" class="btn">① Chromeで開く（最優先・推奨）</a>
+<a id="b2" class="btn">② Chromeで開く（予備ルート）</a>
+<a id="b3" class="btn">③ 通常リンクで開く</a>
+
+<p class="small">※①→②→③の順に試してください。①と②はChromeを指名します。<br>
+開かないときは端末の <b>設定 → アプリ → Googleドライブ → 既定で開く → 許可しない/既定を消去</b> も実施。</p>
+
+<hr>
+<p class="small">URLを手動でコピーする場合：</p>
+<input id="u" readonly>
 
 <script>
+  // ←←← ここだけ自分の本番 /exec に差し替え（/u/N を付けない）
   const EXEC = 'https://script.google.com/macros/s/AKfycbxD2EgTb7SeKVQwopr2jaJ_5ZEYwmN11fXPKZoVsNV9r3cZUHikEp_0Rdt3zEdgyym-/exec';
-  // Android: Chromeを強制する intent:// 形式（Chrome未インストール時は通常URLへフォールバック）
-  const INTENT = 'intent://macros/s/' + encodeURIComponent(EXEC.split('/s/')[1]) +
-                 '#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=' +
-                 encodeURIComponent(EXEC) + ';end';
 
-  document.getElementById('btn1').href = INTENT;
-  document.getElementById('btn2').href = EXEC;
+  // ① googlechrome://navigate?url=... （最も壊れにくいChrome強制）
+  const CHROME_NAV = 'googlechrome://navigate?url=' + encodeURIComponent(EXEC);
+
+  // ② intent:// … package=com.android.chrome （一部端末で効くChrome強制）
+  //   intent の書式崩れを避けるため、URL全体を S.browser_fallback_url に入れるだけにします
+  const CHROME_INTENT =
+    'intent://open#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url='
+    + encodeURIComponent(EXEC) + ';end';
+
+  // ③ 通常の https
+  const NORMAL = EXEC;
+
+  document.getElementById('b1').href = CHROME_NAV;
+  document.getElementById('b2').href = CHROME_INTENT;
+  document.getElementById('b3').href = NORMAL;
+  document.getElementById('u').value = EXEC;
+
+  // 自動トライ（ページを開いたら ①→③ フォールバック）
+  // まず①を投げ、0.8秒待って画面遷移しなければ③へ。
+  (function autoOpen(){
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    if(!isAndroid) return;               // Androidだけ自動
+    const t = setTimeout(()=>{ location.href = NORMAL; }, 800);
+    location.href = CHROME_NAV;          // ①を先に試す
+  })();
 </script>
