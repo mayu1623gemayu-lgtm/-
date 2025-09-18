@@ -1,42 +1,25 @@
 <!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TimeLog Launcher (ServiceLogin)</title>
+<title>TimeLog Launcher</title>
 <style>
   body{font:16px/1.6 system-ui,sans-serif;padding:22px}
-  .card{border:1px solid #ddd;border-radius:12px;padding:16px;max-width:560px}
-  button{padding:10px 14px;border:1px solid #888;border-radius:10px;background:#fff;cursor:pointer}
-  .small{color:#666;font-size:13px;margin-top:10px}
-  input[type=text]{width:100%;padding:8px;border:1px solid #ccc;border-radius:8px}
+  a.btn{display:block;margin:10px 0;padding:10px 14px;border:1px solid #888;border-radius:10px;text-decoration:none}
+  .small{color:#666;font-size:13px}
 </style>
 
-<div class="card">
-  <h2>TimeLog を開く（パスワードでサインイン）</h2>
-  <form id="f" action="https://accounts.google.com/ServiceLogin" method="GET" target="_self">
-    <!-- ★ここを書き換える：あなたの本番 /exec URL と Gmail -->
-    <input type="hidden" name="continue" id="cont" value="https://script.google.com/macros/s/AKfycbxD2EgTb7SeKVQwopr2jaJ_5ZEYwmN11fXPKZoVsNV9r3cZUHikEp_0Rdt3zEdgyym-/exec">
-    <input type="hidden" name="Email"    value="mayu1623gemayu@gmail.com">
-
-    <!-- これらは “パスワード入力画面” を強制するおまじない -->
-    <input type="hidden" name="hl"        value="ja">
-    <input type="hidden" name="flowName"  value="GlifWebSignIn">
-    <input type="hidden" name="flowEntry" value="ServiceLogin">
-    <input type="hidden" name="skipvpage" value="true">
-
-    <p class="small">※ボタンを押すと Google の<strong>パスワード入力画面</strong>に進みます。サインイン後に TimeLog が開きます。</p>
-    <button type="submit">パスワードで開く</button>
-  </form>
-
-  <p class="small" style="margin-top:18px">
-    開かない場合：<br>
-    1) <code>EXEC_URL</code> が <strong>/exec</strong>（本番デプロイ）であることを確認<br>
-    2) Apps Script の「ウェブアプリ」公開設定が正しいことを確認（少なくとも自分は開ける）<br>
-    3) もう一度このページを再読み込み → ボタン押下
-  </p>
-</div>
+<h2>TimeLog を開く</h2>
+<a id="btn1" class="btn">① Chromeで開く（強制）</a>
+<a id="btn2" class="btn">② 通常リンクで開く</a>
+<p class="small">※①でダメなら②を試し、Aの端末設定も実施してください。</p>
 
 <script>
-  // 念のため：意図せぬ二重エンコードを防ぐ（/exec の末尾に空白等が混ざる事故対策）
-  const cont = document.getElementById('cont');
-  cont.value = (cont.value || '').trim();
+  const EXEC = 'https://script.google.com/macros/s/AKfycbxD2EgTb7SeKVQwopr2jaJ_5ZEYwmN11fXPKZoVsNV9r3cZUHikEp_0Rdt3zEdgyym-/exec';
+  // Android: Chromeを強制する intent:// 形式（Chrome未インストール時は通常URLへフォールバック）
+  const INTENT = 'intent://macros/s/' + encodeURIComponent(EXEC.split('/s/')[1]) +
+                 '#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=' +
+                 encodeURIComponent(EXEC) + ';end';
+
+  document.getElementById('btn1').href = INTENT;
+  document.getElementById('btn2').href = EXEC;
 </script>
